@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	taskQueue := tasks.NewTaskQueue()
+	taskQueue := task.NewTaskQueue()
 	taskQueue.StartWorkers(3)
 
 	apiRouter := api.SetupAPIRoutes(taskQueue)
@@ -23,7 +23,7 @@ func main() {
 	}
 
 	go func() {
-		worker.startPrometheusMetricsServer()
+		go api.StartPrometheusMetricsServer()
 		http.Handle("/metrics", promhttp.Handler())
 		server.ListenAndServe()
 	}()

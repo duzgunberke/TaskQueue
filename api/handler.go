@@ -8,11 +8,25 @@ import (
 	"time"
 
 	"github.com/duzgunberke/task-queue/tasks" // Paket ismi değiştirildi
-	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
+var taskQueue *task.TaskQueue // taskQueue'yu paket düzeyinde tanımladık
+
+func SetupAPIRoutes(queue *task.TaskQueue) *http.ServeMux {
+	taskQueue = queue
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/enqueue", EnqueueTaskHandler)
+	mux.HandleFunc("/tasks", GetTasksHandler)
+
+	// Prometheus metrikleri için endpoint
+	mux.Handle("/metrics", promhttp.Handler())
+
+	return mux
+}
 
 func EnqueueTaskHandler(w http.ResponseWriter, r *http.Request) {
-	var t tasks.Task // Task tipi düzeltilmiş
+	var t task.Task
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&t); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -25,9 +39,9 @@ func EnqueueTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 	// Bu örnek basit bir şekilde tüm görevleri döndürüyor, gerçek bir uygulama daha karmaşık bir sorgu ve filtreleme yapacaktır.
-	var tasks []tasks.Task // Task tipi düzeltilmiş
+	var tasks []task.Task // Task tipi düzeltilmiş
 	for i := 0; i < 5; i++ {
-		tasks = append(tasks, tasks.Task{
+		tasks = append(tasks, task.Task{
 			ID:        i + 1,
 			Payload:   fmt.Sprintf("Task %d", i+1),
 			Schedule:  time.Now(),
@@ -43,7 +57,7 @@ func GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(tasks)
 }
 
-func startPrometheusMetricsServer() {
+func StartPrometheusMetricsServer() {
     http.Handle("/metrics", promhttp.Handler())
     http.ListenAndServe(":9090", nil)
 }
