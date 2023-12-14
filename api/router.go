@@ -2,9 +2,10 @@ package api
 
 import (
 	"github.com/gorilla/mux"
+	"github.com/duzgunberke/task-queue/tasks" // Eksik olan import
 )
 
-func setupAPIRoutes(taskQueue *TaskQueue) *mux.Router {
+func SetupAPIRoutes(taskQueue *tasks.TaskQueue) *mux.Router { // TaskQueue tipi düzeltildi
 	r := mux.NewRouter()
 
 	r.HandleFunc("/enqueue", EnqueueTaskHandler).Methods("POST")

@@ -1,4 +1,4 @@
-module TaskQueue
+module github.com/duzgunberke/task-queue
 
 go 1.21.5
 

@@ -1,7 +1,24 @@
 package task
 
 import (
+	"fmt"
 	"sync"
+	"time"
+)
+
+type Task struct {
+	ID        int
+	Payload   string
+	Schedule  time.Time
+	Interval  time.Duration
+	Timeout   time.Duration
+	Priority  int
+	MaxRetries int
+}
+
+var (
+	mutexMap     = make(map[string]*sync.Mutex)
+	mutexMapLock sync.Mutex
 )
 
 type TaskQueue struct {
@@ -13,6 +30,8 @@ func NewTaskQueue() *TaskQueue {
 	return &TaskQueue{Tasks: make(chan Task, 10)}
 }
 
+
+// EnqueueTask adds a task to the task queue.
 func (q *TaskQueue) EnqueueTask(task Task) {
 	// Eş zamanlı işlemi önlemek için göreve özel bir kilit oluştur
 	taskLock := getTaskLock(task.ID)

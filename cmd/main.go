@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/duzgunberke/task-queue/api"
-	"github.com/duzgunberke/task-queue/tasks"
+	"github.com/duzgunberke/task-queue/tasks" // Güncellenmiş import
 	"github.com/prometheus/client_golang/prometheus/promhttp" // eksik import
 
 )

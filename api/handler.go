@@ -2,28 +2,32 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
+	"math/rand"
 	"net/http"
+	"time"
 
+	"github.com/duzgunberke/task-queue/tasks" // Paket ismi değiştirildi
 	"github.com/gorilla/mux"
 )
 
 func EnqueueTaskHandler(w http.ResponseWriter, r *http.Request) {
-	var task Task
+	var t tasks.Task // Task tipi düzeltilmiş
 	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&task); err != nil {
+	if err := decoder.Decode(&t); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	taskQueue.EnqueueTask(task)
+	taskQueue.EnqueueTask(t)
 	w.WriteHeader(http.StatusAccepted)
 }
 
 func GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 	// Bu örnek basit bir şekilde tüm görevleri döndürüyor, gerçek bir uygulama daha karmaşık bir sorgu ve filtreleme yapacaktır.
-	var tasks []Task
+	var tasks []tasks.Task // Task tipi düzeltilmiş
 	for i := 0; i < 5; i++ {
-		tasks = append(tasks, Task{
+		tasks = append(tasks, tasks.Task{
 			ID:        i + 1,
 			Payload:   fmt.Sprintf("Task %d", i+1),
 			Schedule:  time.Now(),
