@@ -4,8 +4,39 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+var (
+	duplicateTaskCounter = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "task_queue_duplicate_tasks_total",
+		Help: "Total number of duplicate tasks received",
+	})
+	taskCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "task_queue_tasks_total",
+		Help: "Total number of tasks processed",
+	}, []string{"result"})
+	taskDuration = promauto.NewHistogramVec(prometheus.HistogramOpts{
+		Name:    "task_queue_task_duration_seconds",
+		Help:    "Duration of tasks processed",
+		Buckets: prometheus.DefBuckets,
+	}, []string{"result"})
+	priorityCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "task_queue_task_priority_total",
+		Help: "Total number of tasks processed by priority",
+	}, []string{"priority"})
+)
+
+func init() {
+	// Metrikleri Prometheus'a kaydet
+	prometheus.MustRegister(duplicateTaskCounter)
+	prometheus.MustRegister(taskCounter)
+	prometheus.MustRegister(taskDuration)
+	prometheus.MustRegister(priorityCounter)
+}
 type Worker struct {
 	ID    int
 	Tasks chan Task

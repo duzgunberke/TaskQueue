@@ -42,3 +42,8 @@ func GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(tasks)
 }
+
+func startPrometheusMetricsServer() {
+    http.Handle("/metrics", promhttp.Handler())
+    http.ListenAndServe(":9090", nil)
+}

@@ -1,17 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/duzgunberke/task-queue/api"
-	"github.com/duzgunberke/task-queue/tasks" // Güncellenmiş import
-	"github.com/prometheus/client_golang/prometheus/promhttp" // eksik import
-
+	"github.com/duzgunberke/task-queue/tasks"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
-	taskQueue := tasks.NewTaskQueue() // tasks paketini import etmiş olmalısınız
+	taskQueue := tasks.NewTaskQueue()
 	taskQueue.StartWorkers(3)
 
 	apiRouter := api.SetupAPIRoutes(taskQueue)
@@ -23,9 +23,13 @@ func main() {
 	}
 
 	go func() {
+		worker.startPrometheusMetricsServer()
 		http.Handle("/metrics", promhttp.Handler())
 		server.ListenAndServe()
 	}()
 
-	time.Sleep(20 * time.Second) // Simulate the application running for a while
+	fmt.Println("Server is running on :8080")
+	
+	// Uygulamanın bir süre çalışmasını simüle et
+	time.Sleep(20 * time.Second)
 }
