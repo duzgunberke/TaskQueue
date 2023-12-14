@@ -5,11 +5,13 @@ import (
 	"time"
 
 	"github.com/duzgunberke/task-queue/api"
-	"github.com/duzgunberke/task-queue/internal/task"
+	"github.com/duzgunberke/task-queue/internal/tasks"
+	"github.com/prometheus/client_golang/prometheus/promhttp" // eksik import
+
 )
 
 func main() {
-	taskQueue := task.NewTaskQueue()
+	taskQueue := tasks.NewTaskQueue() // tasks paketini import etmiş olmalısınız
 	taskQueue.StartWorkers(3)
 
 	apiRouter := api.SetupAPIRoutes(taskQueue)
